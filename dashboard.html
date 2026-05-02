@@ -1,0 +1,2286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1a1a1a" />
+<title>Scholar's Progress</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf6ee;
+    --paper-dark: #ece3d0;
+    --accent: #e85a3f;
+    --accent-2: #2fa56d;
+    --gold: #f4b740;
+    --blue: #4a90d9;
+    --rule: #1a1a1a;
+    --muted: #6b6259;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(232, 90, 63, 0.05) 0, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(47, 165, 109, 0.05) 0, transparent 50%);
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 32px 48px 80px; }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding: 24px 0 28px;
+    text-align: center;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-style: italic;
+  }
+  .title .amp { font-style: italic; color: var(--accent); font-weight: 500; }
+  .subtitle {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .toolbar-left, .toolbar-right { display: flex; gap: 8px; align-items: center; }
+  .save-status {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .save-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
+  .save-status.saving .dot { background: var(--gold); animation: pulse 1s infinite; }
+  .save-status.error .dot { background: var(--accent); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .pill-btn {
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+  .pill-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .pill-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pill-btn.primary { background: var(--ink); color: var(--paper); }
+  .pill-btn.primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+  .pill-btn.danger { border-color: var(--accent); color: var(--accent); }
+  .pill-btn.danger:hover { background: var(--accent); color: var(--paper); }
+
+  /* ---------- Date strip ---------- */
+  .date-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .today-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 36px;
+    font-weight: 700;
+  }
+  .today-date {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .date-nav { display: flex; gap: 8px; align-items: center; }
+  .date-nav button {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    transition: all 0.2s;
+    color: var(--ink);
+  }
+  .date-nav button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .date-nav input[type="date"] {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  /* ---------- Stats bar ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .stat {
+    padding: 22px 24px;
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--paper);
+    position: relative;
+  }
+  .stat-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-value .unit {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    font-style: normal;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .stat.accent .stat-value { color: var(--accent); }
+  .stat.green .stat-value { color: var(--accent-2); }
+  .stat.gold .stat-value { color: var(--gold); }
+
+  /* ---------- Grid ---------- */
+  .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .section-meta {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- Subject cards ---------- */
+  .subjects { display: flex; flex-direction: column; gap: 14px; }
+  .subject {
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--paper);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    gap: 18px;
+    align-items: center;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+    position: relative;
+  }
+  .subject:hover { background: #fff; }
+  .subject.complete {
+    background: rgba(47, 165, 109, 0.10);
+    border-color: var(--accent-2);
+  }
+  .subject.complete::after {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 22px;
+    color: var(--accent-2);
+    font-weight: 900;
+    animation: pop 0.4s ease;
+  }
+  @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+  .subject.dragging { opacity: 0.4; }
+  .subject.drag-over { border-top: 4px solid var(--accent); }
+
+  .drag-handle {
+    color: var(--muted);
+    cursor: grab;
+    user-select: none;
+    font-size: 18px;
+    padding: 8px 4px;
+    line-height: 1;
+  }
+  .drag-handle:hover { color: var(--ink); }
+  .drag-handle:active { cursor: grabbing; }
+
+  .subject-icon {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    background: var(--paper);
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .subject.complete .subject-icon {
+    background: var(--accent-2);
+    color: #fff;
+    border-color: var(--accent-2);
+  }
+  .subject-info { min-width: 0; }
+  .subject-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    word-break: break-word;
+    line-height: 1.2;
+  }
+  .subject-meta {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .subject-progress {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 240px;
+  }
+  .stepper-btn {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    transition: transform 0.1s, background 0.15s;
+    color: var(--ink);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .stepper-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .stepper-btn:active:not(:disabled) { transform: scale(0.92); }
+  .stepper-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .progress-input {
+    width: 70px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 900;
+    padding: 4px 0;
+    color: var(--ink);
+    -moz-appearance: textfield;
+    line-height: 1;
+  }
+  .progress-input::-webkit-outer-spin-button,
+  .progress-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .progress-input:focus { outline: none; border-color: var(--accent); }
+  .progress-of {
+    font-family: 'Nunito', sans-serif;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .progress-target {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--muted);
+    line-height: 1;
+  }
+  .progress-unit {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .progress-bar {
+    width: 100%;
+    flex: 1;
+    height: 10px;
+    background: var(--paper-dark);
+    border-radius: 999px;
+    position: relative;
+    overflow: hidden;
+    min-width: 80px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  .subject.complete .progress-fill { background: var(--accent-2); }
+  .subject-actions { display: flex; gap: 6px; }
+  .icon-btn {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .icon-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .icon-btn.danger:hover { background: var(--accent); border-color: var(--accent); }
+
+  .subject-edit {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 60px 1fr 100px 110px auto auto;
+    gap: 10px;
+    padding: 12px 0 4px;
+    align-items: center;
+    border-top: 1px dashed var(--muted);
+    margin-top: 8px;
+  }
+  .subject-edit input {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 8px 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    width: 100%;
+  }
+  .subject-edit input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  /* ---------- Add form ---------- */
+  .add-form {
+    border: 2px dashed var(--ink);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-top: 16px;
+    background: rgba(255,255,255,0.4);
+  }
+  .add-form-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .add-form-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 100px 110px auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .add-form input {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+  }
+  .add-form input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .add-form button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .add-form button:hover { background: var(--accent); }
+
+  /* ---------- Notes ---------- */
+  .notes-card {
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--paper);
+    padding: 22px 24px;
+    margin-top: 32px;
+  }
+  .notes-card h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .notes-card textarea {
+    width: 100%;
+    min-height: 110px;
+    background: transparent;
+    border: 1.5px dashed var(--muted);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--ink);
+    resize: vertical;
+    line-height: 1.55;
+  }
+  .notes-card textarea:focus {
+    outline: none;
+    border-color: var(--ink);
+    border-style: solid;
+  }
+  .notes-card .meta {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar { display: flex; flex-direction: column; gap: 32px; }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .week-day {
+    aspect-ratio: 1;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .week-day:hover { background: var(--paper-dark); }
+  .week-day.today { background: var(--ink); color: var(--paper); }
+  .week-day.active { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .week-day-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+  .week-day-num {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .week-day-bar {
+    width: 80%;
+    height: 4px;
+    background: var(--paper-dark);
+    border-radius: 999px;
+    margin-top: 6px;
+    position: relative;
+  }
+  .week-day.today .week-day-bar { background: rgba(244, 237, 226, 0.3); }
+  .week-day-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+  .week-day.today .week-day-bar-fill { background: var(--gold); }
+
+  .streak {
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 28px;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .streak::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.4;
+  }
+  .streak-num {
+    font-family: 'Fraunces', serif;
+    font-size: 110px;
+    font-weight: 900;
+    line-height: 0.9;
+    font-style: italic;
+    letter-spacing: -0.04em;
+    position: relative;
+  }
+  .streak-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    margin-top: 8px;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .streak-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    margin-top: 6px;
+    opacity: 0.85;
+    position: relative;
+  }
+
+  .history-list { display: flex; flex-direction: column; gap: 0; }
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px dotted var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-item:hover .history-date { color: var(--ink); }
+  .history-date {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 70px;
+  }
+  .history-pct {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 20px;
+    min-width: 56px;
+    text-align: right;
+  }
+  .history-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--paper-dark);
+    border-radius: 999px;
+    margin: 0 16px;
+  }
+  .history-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+  .history-bar-fill.full { background: var(--accent-2); }
+
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .loading .err {
+    color: var(--accent);
+    margin-top: 12px;
+    font-size: 14px;
+  }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    z-index: 100;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 26, 0.6);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px;
+    z-index: 200;
+    overflow-y: auto;
+  }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    max-width: 720px;
+    width: 100%;
+    padding: 32px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .modal-close {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stats-card {
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 18px;
+    background: var(--paper);
+  }
+  .stats-card .label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .stats-card .value {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .stats-card .value .unit {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .stats-section { margin-top: 28px; }
+  .stats-section h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .month-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--paper-dark);
+    border-radius: 6px;
+    background: var(--paper);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 4px 5px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .month-cell.empty { opacity: 0.3; cursor: default; }
+  .month-cell .fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0.18;
+    transform-origin: bottom;
+  }
+  .month-cell.full .fill { background: var(--accent-2); opacity: 0.7; }
+  .month-cell .num { position: relative; z-index: 1; }
+  .month-cell:hover { border-color: var(--ink); }
+
+  .subject-stats { display: flex; flex-direction: column; gap: 12px; }
+  .subj-stat-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--muted);
+  }
+  .subj-stat-row:last-child { border-bottom: none; }
+  .subj-stat-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .subj-stat-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .subj-stat-bar {
+    height: 8px;
+    background: var(--paper-dark);
+    border-radius: 999px;
+    margin-top: 4px;
+  }
+  .subj-stat-bar-fill {
+    height: 100%;
+    background: var(--accent-2);
+    border-radius: 999px;
+  }
+  .subj-stat-pct {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 90px;
+    text-align: right;
+  }
+
+  /* Settings modal */
+  .settings-section-head {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 24px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .settings-section-head:first-of-type { margin-top: 0; }
+  .settings-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px dotted var(--muted);
+  }
+  .settings-row:last-of-type { border-bottom: none; }
+  .settings-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .settings-help {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .settings-help a { color: var(--accent); text-decoration: underline; }
+  .settings-row input[type="text"],
+  .settings-row input[type="time"],
+  .settings-row input[type="password"] {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* ---------- Setup wizard ---------- */
+  .setup-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .setup-card {
+    max-width: 580px;
+    width: 100%;
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--paper);
+    padding: 32px 36px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  }
+  .setup-card h1 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 800;
+    font-size: 42px;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .setup-card .lead {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .setup-field { margin-bottom: 18px; }
+  .setup-field label {
+    display: block;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .setup-field input {
+    width: 100%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .setup-field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .setup-help {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .setup-help a { color: var(--accent); text-decoration: underline; }
+  .setup-error {
+    background: rgba(232, 90, 63, 0.10);
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    word-break: break-word;
+  }
+  .setup-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--paper-dark);
+  }
+  details.setup-howto {
+    margin: 8px 0 16px;
+    padding: 14px 16px;
+    border: 1.5px dashed var(--muted);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.4);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  details.setup-howto summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--accent-2);
+  }
+  details.setup-howto ol { margin: 12px 0 0 20px; }
+  details.setup-howto li { margin-bottom: 6px; }
+  details.setup-howto code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--paper-dark);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .file-picker {
+    border: 1.5px dashed var(--muted);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    display: inline-block;
+  }
+  .file-picker:hover { border-color: var(--ink); color: var(--ink); }
+  .file-picker input { display: none; }
+  .file-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent-2);
+    margin-left: 8px;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 900px) {
+    .container { padding: 20px 16px 60px; }
+    .grid { grid-template-columns: 1fr; gap: 24px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .subject {
+      grid-template-columns: auto auto 1fr;
+      grid-template-areas:
+        "drag icon info"
+        "progress progress progress"
+        "actions actions actions";
+      gap: 12px;
+    }
+    .drag-handle { grid-area: drag; }
+    .subject-icon { grid-area: icon; }
+    .subject-info { grid-area: info; }
+    .subject-progress { grid-area: progress; justify-content: space-between; min-width: 0; flex-wrap: wrap; }
+    .subject-actions { grid-area: actions; justify-content: flex-end; }
+    .progress-bar { width: 100%; flex: 1 0 100%; order: 99; margin-top: 4px; }
+    .add-form-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .add-form-row > *:last-child { grid-column: 1 / -1; }
+    .subject-edit { grid-template-columns: 1fr 1fr; }
+    .subject-edit > *:nth-last-child(-n+2) { grid-column: span 1; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .settings-row { grid-template-columns: 1fr; gap: 8px; }
+    .modal { padding: 20px; }
+    .modal-title { font-size: 24px; }
+    .title { font-size: clamp(36px, 10vw, 56px); }
+    .setup-card { padding: 24px 20px; }
+    .setup-card h1 { font-size: 32px; }
+    .stepper-btn { width: 52px; height: 52px; font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Loading…</div></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+// ----------------------------------------------------------------------------
+// Date helpers
+// ----------------------------------------------------------------------------
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const formatDate = (key) => {
+  const [y, m, d] = key.split('-');
+  const date = new Date(+y, +m-1, +d);
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+};
+const shortDate = (key) => {
+  const [y, m, d] = key.split('-');
+  const date = new Date(+y, +m-1, +d);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+const dayLabel = (key) => {
+  const [y, m, d] = key.split('-');
+  const date = new Date(+y, +m-1, +d);
+  return { weekday: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(), num: date.getDate() };
+};
+const shiftDate = (key, days) => {
+  const [y, m, d] = key.split('-');
+  const date = new Date(+y, +m-1, +d);
+  date.setDate(date.getDate() + days);
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+};
+const monthKey = (key) => key.slice(0, 7);
+const daysInMonth = (yyyymm) => {
+  const [y, m] = yyyymm.split('-').map(n => +n);
+  return new Date(y, m, 0).getDate();
+};
+
+// ----------------------------------------------------------------------------
+// Stats helpers
+// ----------------------------------------------------------------------------
+function dayCompletion(progressForDay, subjects) {
+  if (!subjects.length) return 0;
+  return subjects.reduce((sum, s) => {
+    const v = progressForDay?.[s.id] || 0;
+    return sum + Math.min(1, v / Math.max(1, s.target));
+  }, 0) / subjects.length;
+}
+
+function computeStreak(progress, subjects) {
+  if (!subjects.length) return 0;
+  let streak = 0;
+  let cursor = todayKey();
+  while (true) {
+    const dp = progress[cursor] || {};
+    const allMet = subjects.every(s => (dp[s.id] || 0) >= s.target);
+    if (!allMet) break;
+    streak++;
+    cursor = shiftDate(cursor, -1);
+  }
+  return streak;
+}
+
+function computeBestStreak(progress, subjects) {
+  if (!subjects.length) return 0;
+  const keys = Object.keys(progress).sort();
+  if (!keys.length) return 0;
+  let best = 0, current = 0;
+  let cursor = keys[0];
+  const end = todayKey();
+  while (cursor <= end) {
+    const dp = progress[cursor] || {};
+    const allMet = subjects.every(s => (dp[s.id] || 0) >= s.target);
+    if (allMet) { current++; if (current > best) best = current; }
+    else current = 0;
+    cursor = shiftDate(cursor, 1);
+  }
+  return best;
+}
+
+// ----------------------------------------------------------------------------
+// Default data
+// ----------------------------------------------------------------------------
+function defaultData() {
+  return {
+    version: 1,
+    subjects: [
+      { id: 's1', name: 'Math Homework',    icon: '∑', unit: 'exercises', target: 10 },
+      { id: 's2', name: 'English Homework', icon: 'A', unit: 'exercises', target: 8  },
+      { id: 's3', name: 'Reading',          icon: '❦', unit: 'pages',     target: 30 },
+    ],
+    progress: {},
+    notes: {},
+    settings: { reminder_time: '', child_name: '' },
+  };
+}
+
+// ----------------------------------------------------------------------------
+// UTF-8 ↔ Base64 (handles non-ASCII like ∑, ❦, accented letters)
+// ----------------------------------------------------------------------------
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+function base64ToUtf8(b64) {
+  const binary = atob(b64.replace(/\s/g, ''));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+// ----------------------------------------------------------------------------
+// GitHub Contents-API store. Uses SHA for conflict-free updates.
+// ----------------------------------------------------------------------------
+const CONFIG_KEY = 'sp.gh.config';
+
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null'); }
+  catch { return null; }
+}
+function saveConfig(cfg) { localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); }
+function clearConfig() { localStorage.removeItem(CONFIG_KEY); }
+
+class GhStore {
+  constructor(cfg) {
+    this.cfg = cfg;
+    this.sha = null;
+  }
+  get url() {
+    const { owner, repo, path, branch } = this.cfg;
+    const params = branch ? `?ref=${encodeURIComponent(branch)}` : '';
+    return `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURI(path)}${params}`;
+  }
+  get headers() {
+    return {
+      Authorization: `Bearer ${this.cfg.token}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    };
+  }
+  async testConnection() {
+    const res = await fetch(this.url, { headers: this.headers });
+    if (res.status === 200 || res.status === 404) return { ok: true, exists: res.status === 200 };
+    if (res.status === 401) throw new Error('Token rejected (401). Re-create the token, or check that you copied it correctly.');
+    if (res.status === 403) {
+      const text = await res.text();
+      throw new Error('Forbidden (403). Token must have Contents: Read and write on this repo. ' + text.slice(0, 200));
+    }
+    if (res.status === 404) throw new Error('Repo not found (404). Check owner/repo. For private repos the token must have access.');
+    throw new Error(`Unexpected ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  }
+  async load() {
+    const res = await fetch(this.url, { headers: this.headers });
+    if (res.status === 404) {
+      this.sha = null;
+      return defaultData();
+    }
+    if (!res.ok) throw new Error(`GitHub load (${res.status}): ${(await res.text()).slice(0, 300)}`);
+    const j = await res.json();
+    this.sha = j.sha;
+    let text;
+    if (j.encoding === 'base64' && j.content) {
+      text = base64ToUtf8(j.content);
+    } else if (j.download_url) {
+      const dl = await fetch(j.download_url);
+      text = await dl.text();
+    } else {
+      throw new Error('Unsupported file encoding from GitHub.');
+    }
+    let parsed;
+    try { parsed = JSON.parse(text); }
+    catch (e) { throw new Error('Stored file is not valid JSON: ' + e.message); }
+    const d = defaultData();
+    return {
+      version: parsed.version || 1,
+      subjects: parsed.subjects || d.subjects,
+      progress: parsed.progress || {},
+      notes: parsed.notes || {},
+      settings: { ...d.settings, ...(parsed.settings || {}) },
+    };
+  }
+  async save(data, message) {
+    const body = {
+      message: message || `Update progress · ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`,
+      content: utf8ToBase64(JSON.stringify(data, null, 2)),
+    };
+    if (this.sha) body.sha = this.sha;
+    if (this.cfg.branch) body.branch = this.cfg.branch;
+
+    const headers = { ...this.headers, 'Content-Type': 'application/json' };
+    let res = await fetch(this.url, { method: 'PUT', headers, body: JSON.stringify(body) });
+
+    if (res.status === 409) {
+      await this.load();
+      body.sha = this.sha;
+      res = await fetch(this.url, { method: 'PUT', headers, body: JSON.stringify(body) });
+    }
+    if (!res.ok) {
+      const text = (await res.text()).slice(0, 300);
+      throw new Error(`GitHub save (${res.status}): ${text}`);
+    }
+    const j = await res.json();
+    this.sha = j.content?.sha || this.sha;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Root component — picks Setup vs App
+// ----------------------------------------------------------------------------
+function Root() {
+  const [config, setConfig] = useState(loadConfig());
+
+  if (!config) {
+    return <SetupWizard onSaved={(c) => setConfig(c)} />;
+  }
+  return <App
+    config={config}
+    onClearConfig={() => { clearConfig(); setConfig(null); }}
+    onUpdateConfig={(c) => { saveConfig(c); setConfig(c); }}
+  />;
+}
+
+// ----------------------------------------------------------------------------
+// App
+// ----------------------------------------------------------------------------
+function App({ config, onClearConfig, onUpdateConfig }) {
+  const storeRef = useRef(new GhStore(config));
+  const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [saveStatus, setSaveStatus] = useState('saved');
+  const [saveError, setSaveError] = useState('');
+  const [data, setData] = useState({ subjects: [], progress: {}, notes: {}, settings: {} });
+  const [activeDate, setActiveDate] = useState(todayKey());
+  const [toast, setToast] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const saveTimer = useRef(null);
+
+  useEffect(() => { storeRef.current = new GhStore(config); }, [config]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const d = await storeRef.current.load();
+        setData(d);
+        setLoaded(true);
+      } catch (e) {
+        setLoadError(String(e.message || e));
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+    const ms = nextMidnight - now;
+    const t = setTimeout(() => setActiveDate(todayKey()), ms);
+    return () => clearTimeout(t);
+  }, [activeDate]);
+
+  const scheduleSave = useCallback((next) => {
+    setSaveStatus('saving');
+    setSaveError('');
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try {
+        await storeRef.current.save(next);
+        setSaveStatus('saved');
+      } catch (e) {
+        console.error('save failed:', e);
+        setSaveStatus('error');
+        setSaveError(String(e.message || e));
+      }
+    }, 3000);
+  }, []);
+
+  const update = (mutator) => {
+    setData(prev => {
+      const next = mutator(prev);
+      scheduleSave(next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    const beforeUnload = (e) => {
+      if (saveStatus === 'saving') {
+        e.preventDefault();
+        e.returnValue = 'Changes are still being saved. Leave anyway?';
+      }
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    return () => window.removeEventListener('beforeunload', beforeUnload);
+  }, [saveStatus]);
+
+  const todayProgress = data.progress[activeDate] || {};
+  const todayNote = data.notes[activeDate] || '';
+
+  const setSubjectProgress = (subjectId, value) => {
+    const v = Math.max(0, parseInt(value) || 0);
+    update(prev => ({
+      ...prev,
+      progress: { ...prev.progress, [activeDate]: { ...(prev.progress[activeDate] || {}), [subjectId]: v } },
+    }));
+  };
+
+  const stepProgress = (subjectId, delta) => {
+    const cur = todayProgress[subjectId] || 0;
+    setSubjectProgress(subjectId, cur + delta);
+  };
+
+  const setNoteForActive = (txt) => {
+    update(prev => {
+      const notes = { ...prev.notes };
+      if (txt) notes[activeDate] = txt;
+      else delete notes[activeDate];
+      return { ...prev, notes };
+    });
+  };
+
+  const addSubject = (s) => {
+    const newSubj = { id: 's' + Date.now(), ...s };
+    update(prev => ({ ...prev, subjects: [...prev.subjects, newSubj] }));
+    showToast(`Added ${s.name}`);
+  };
+
+  const removeSubject = (id) => {
+    update(prev => ({ ...prev, subjects: prev.subjects.filter(s => s.id !== id) }));
+    showToast('Subject removed');
+  };
+
+  const updateSubject = (id, fields) => {
+    update(prev => ({
+      ...prev,
+      subjects: prev.subjects.map(s => s.id === id ? { ...s, ...fields } : s),
+    }));
+    showToast('Subject updated');
+  };
+
+  const reorderSubject = (fromId, toId) => {
+    if (fromId === toId) return;
+    update(prev => {
+      const list = [...prev.subjects];
+      const fromIdx = list.findIndex(s => s.id === fromId);
+      const toIdx = list.findIndex(s => s.id === toId);
+      if (fromIdx < 0 || toIdx < 0) return prev;
+      const [moved] = list.splice(fromIdx, 1);
+      list.splice(toIdx, 0, moved);
+      return { ...prev, subjects: list };
+    });
+  };
+
+  const markComplete = (subjectId) => {
+    const subj = data.subjects.find(s => s.id === subjectId);
+    if (!subj) return;
+    setSubjectProgress(subjectId, subj.target);
+  };
+
+  const updateSettings = (fields) => {
+    update(prev => ({ ...prev, settings: { ...prev.settings, ...fields } }));
+  };
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 1800);
+  };
+
+  const flushSave = async () => {
+    if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
+    setSaveStatus('saving');
+    try {
+      await storeRef.current.save(data, 'Manual save');
+      setSaveStatus('saved');
+      setSaveError('');
+      showToast('Saved');
+    } catch (e) {
+      setSaveStatus('error');
+      setSaveError(String(e.message || e));
+    }
+  };
+
+  const subjects = data.subjects;
+  const totalCompletion = useMemo(() => dayCompletion(todayProgress, subjects), [todayProgress, subjects]);
+  const completedCount = subjects.filter(s => (todayProgress[s.id] || 0) >= s.target).length;
+  const streak = useMemo(() => computeStreak(data.progress, subjects), [data.progress, subjects]);
+
+  const last7 = useMemo(() => {
+    const out = [];
+    for (let i = 6; i >= 0; i--) {
+      const k = shiftDate(todayKey(), -i);
+      const dp = data.progress[k] || {};
+      out.push({ key: k, pct: dayCompletion(dp, subjects), ...dayLabel(k) });
+    }
+    return out;
+  }, [data.progress, subjects]);
+
+  const history = useMemo(() => {
+    const out = [];
+    for (let i = 1; i <= 14; i++) {
+      const k = shiftDate(todayKey(), -i);
+      const dp = data.progress[k];
+      if (!dp) continue;
+      const pct = dayCompletion(dp, subjects);
+      if (pct > 0) out.push({ key: k, pct });
+    }
+    return out;
+  }, [data.progress, subjects]);
+
+  useReminder(data.settings.reminder_time);
+
+  if (loadError) {
+    return (
+      <div className="loading">
+        <div>
+          Could not load dashboard data.
+          <div className="err">{loadError}</div>
+          <div className="err" style={{ marginTop: 12 }}>
+            <button className="pill-btn" onClick={() => window.location.reload()}>Retry</button>
+            {' '}
+            <button className="pill-btn danger" onClick={() => { onClearConfig(); }}>Reset GitHub setup</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (!loaded) return <div className="loading">Loading your dashboard…</div>;
+
+  const childName = (data.settings.child_name || '').trim();
+  const titleSubject = childName ? `${childName}'s` : "Scholar's";
+
+  return (
+    <div className="container">
+      <header className="masthead">
+        <h1 className="title">{titleSubject} <span className="amp">&</span> Progress</h1>
+        <div className="subtitle">Your daily tasks, tracked.</div>
+      </header>
+
+      <div className="toolbar">
+        <div className="toolbar-left">
+          <SaveIndicator status={saveStatus} error={saveError} />
+        </div>
+        <div className="toolbar-right">
+          <button className="pill-btn" onClick={() => setShowStats(true)}>Statistics</button>
+          <button className="pill-btn" onClick={() => setShowSettings(true)}>Settings</button>
+        </div>
+      </div>
+
+      <div className="date-strip">
+        <div>
+          <div className="today-label">{activeDate === todayKey() ? 'Today' : 'Viewing'}</div>
+          <div className="today-date">{formatDate(activeDate)}</div>
+        </div>
+        <div className="date-nav">
+          <button onClick={() => setActiveDate(shiftDate(activeDate, -1))} title="Previous day">‹</button>
+          <input
+            type="date"
+            value={activeDate}
+            max={todayKey()}
+            onChange={(e) => e.target.value && setActiveDate(e.target.value)}
+          />
+          <button
+            onClick={() => setActiveDate(shiftDate(activeDate, 1))}
+            disabled={activeDate >= todayKey()}
+            style={{ opacity: activeDate >= todayKey() ? 0.3 : 1, cursor: activeDate >= todayKey() ? 'not-allowed' : 'pointer' }}
+            title="Next day"
+          >›</button>
+          {activeDate !== todayKey() && (
+            <button onClick={() => setActiveDate(todayKey())} style={{ width: 'auto', padding: '0 14px' }}>TODAY</button>
+          )}
+        </div>
+      </div>
+
+      <div className="stats">
+        <div className="stat">
+          <div className="stat-label">Done today</div>
+          <div className="stat-value">{Math.round(totalCompletion * 100)}<span className="unit">%</span></div>
+        </div>
+        <div className="stat green">
+          <div className="stat-label">Tasks finished</div>
+          <div className="stat-value">{completedCount}<span className="unit">of {subjects.length}</span></div>
+        </div>
+        <div className="stat accent">
+          <div className="stat-label">Streak</div>
+          <div className="stat-value">{streak}<span className="unit">days in a row</span></div>
+        </div>
+        <div className="stat gold">
+          <div className="stat-label">Subjects</div>
+          <div className="stat-value">{subjects.length}<span className="unit">tracked</span></div>
+        </div>
+      </div>
+
+      <div className="grid">
+        <main>
+          <div className="section-head">
+            <h2 className="section-title">Today's tasks</h2>
+            <span className="section-meta">Tap + or − to update</span>
+          </div>
+
+          <div className="subjects">
+            {subjects.length === 0 ? (
+              <div className="empty">
+                <div className="empty-icon">📚</div>
+                No subjects yet. Add one below to start.
+              </div>
+            ) : (
+              subjects.map(s => (
+                <SubjectRow
+                  key={s.id}
+                  subject={s}
+                  value={todayProgress[s.id] || 0}
+                  editing={editingId === s.id}
+                  onStartEdit={() => setEditingId(s.id)}
+                  onCancelEdit={() => setEditingId(null)}
+                  onChange={(v) => setSubjectProgress(s.id, v)}
+                  onStep={(d) => stepProgress(s.id, d)}
+                  onComplete={() => markComplete(s.id)}
+                  onRemove={() => {
+                    if (confirm(`Remove "${s.name}"? Past progress will be kept in history.`)) removeSubject(s.id);
+                  }}
+                  onSaveEdit={(fields) => { updateSubject(s.id, fields); setEditingId(null); }}
+                  onReorder={reorderSubject}
+                />
+              ))
+            )}
+          </div>
+
+          <AddForm onAdd={addSubject} />
+
+          <div className="notes-card">
+            <h3>Notes for {shortDate(activeDate)}</h3>
+            <textarea
+              placeholder="What did you do today? Anything tricky or fun?"
+              value={todayNote}
+              onChange={(e) => setNoteForActive(e.target.value)}
+            />
+            <div className="meta">{todayNote.length} characters · saves automatically</div>
+          </div>
+        </main>
+
+        <aside className="sidebar">
+          <div className="streak">
+            <div className="streak-num">{streak}</div>
+            <div className="streak-label">Day Streak</div>
+            <div className="streak-sub">
+              {streak === 0 ? "Let's start one today!" : streak === 1 ? 'Nice start!' : streak < 7 ? 'Keep going!' : streak < 30 ? 'Amazing work!' : 'Incredible!'}
+            </div>
+          </div>
+
+          <div>
+            <div className="section-head">
+              <h2 className="section-title">This week</h2>
+              <span className="section-meta">Last 7 days</span>
+            </div>
+            <div className="week-grid">
+              {last7.map(d => (
+                <div
+                  key={d.key}
+                  className={`week-day ${d.key === todayKey() ? 'today' : ''} ${d.key === activeDate ? 'active' : ''}`}
+                  onClick={() => setActiveDate(d.key)}
+                  title={`${formatDate(d.key)} — ${Math.round(d.pct*100)}%`}
+                >
+                  <div className="week-day-label">{d.weekday}</div>
+                  <div className="week-day-num">{d.num}</div>
+                  <div className="week-day-bar">
+                    <div className="week-day-bar-fill" style={{ width: (d.pct * 100) + '%' }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="section-head">
+              <h2 className="section-title">Earlier days</h2>
+              <span className="section-meta">Last 14 days</span>
+            </div>
+            <div className="history-list">
+              {history.length === 0 ? (
+                <div className="empty" style={{ padding: '24px 0' }}>Nothing logged yet.</div>
+              ) : (
+                history.map(h => (
+                  <div key={h.key} className="history-item" onClick={() => setActiveDate(h.key)}>
+                    <span className="history-date">{shortDate(h.key)}</span>
+                    <div className="history-bar">
+                      <div className={`history-bar-fill ${h.pct >= 1 ? 'full' : ''}`} style={{ width: (h.pct * 100) + '%' }}></div>
+                    </div>
+                    <span className="history-pct">{Math.round(h.pct * 100)}%</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer className="footer">
+        <span>Saved to {config.owner}/{config.repo}</span>
+        <span>Made with care · 2026</span>
+      </footer>
+
+      <div className={`toast ${toast ? 'show' : ''}`}>{toast}</div>
+
+      {showStats && (
+        <StatsModal
+          progress={data.progress}
+          subjects={subjects}
+          onClose={() => setShowStats(false)}
+          onPickDate={(k) => { setActiveDate(k); setShowStats(false); }}
+        />
+      )}
+
+      {showSettings && (
+        <SettingsModal
+          settings={data.settings}
+          config={config}
+          onSave={updateSettings}
+          onUpdateConfig={onUpdateConfig}
+          onClearConfig={onClearConfig}
+          onClose={() => setShowSettings(false)}
+          dataSnapshot={data}
+          saveStatus={saveStatus}
+          saveError={saveError}
+          onFlush={flushSave}
+        />
+      )}
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function SaveIndicator({ status, error }) {
+  const label =
+    status === 'saving' ? 'Saving…' :
+    status === 'error'  ? 'Couldn’t save' :
+    'All saved';
+  return (
+    <span className={`save-status ${status}`} title={error || ''}>
+      <span className="dot"></span>{label}
+    </span>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function SubjectRow({ subject, value, editing, onStartEdit, onCancelEdit, onSaveEdit, onChange, onStep, onComplete, onRemove, onReorder }) {
+  const s = subject;
+  const pct = Math.min(100, (value / Math.max(1, s.target)) * 100);
+  const complete = value >= s.target;
+  const [dragging, setDragging] = useState(false);
+  const [over, setOver] = useState(false);
+
+  const [icon, setIcon] = useState(s.icon);
+  const [name, setName] = useState(s.name);
+  const [target, setTarget] = useState(String(s.target));
+  const [unit, setUnit] = useState(s.unit);
+
+  useEffect(() => {
+    if (editing) {
+      setIcon(s.icon); setName(s.name); setTarget(String(s.target)); setUnit(s.unit);
+    }
+  }, [editing, s.id]);
+
+  const handleSave = () => {
+    if (!name.trim() || !unit.trim()) return;
+    onSaveEdit({
+      icon: (icon.trim() || '✦').slice(0, 2),
+      name: name.trim(),
+      target: Math.max(1, parseInt(target) || 1),
+      unit: unit.trim(),
+    });
+  };
+
+  return (
+    <div
+      className={`subject ${complete ? 'complete' : ''} ${dragging ? 'dragging' : ''} ${over ? 'drag-over' : ''}`}
+      onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        setOver(false);
+        const fromId = e.dataTransfer.getData('text/plain');
+        if (fromId && fromId !== s.id) onReorder(fromId, s.id);
+      }}
+    >
+      <div
+        className="drag-handle"
+        draggable
+        onDragStart={(e) => { setDragging(true); e.dataTransfer.setData('text/plain', s.id); e.dataTransfer.effectAllowed = 'move'; }}
+        onDragEnd={() => setDragging(false)}
+        title="Drag to reorder"
+      >⋮⋮</div>
+      <div className="subject-icon">{s.icon}</div>
+      <div className="subject-info">
+        <div className="subject-name">{s.name}</div>
+        <div className="subject-meta">Goal: {s.target} {s.unit}</div>
+      </div>
+      <div className="subject-progress">
+        <button className="stepper-btn" onClick={() => onStep(-1)} title="Less" disabled={value <= 0}>−</button>
+        <input
+          type="number"
+          inputMode="numeric"
+          min="0"
+          className="progress-input"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={(e) => e.target.select()}
+        />
+        <button className="stepper-btn" onClick={() => onStep(1)} title="More">+</button>
+        <span className="progress-of">of</span>
+        <span className="progress-target">{s.target}</span>
+        <span className="progress-unit">{s.unit}</span>
+        <div className="progress-bar"><div className="progress-fill" style={{ width: pct + '%' }}></div></div>
+      </div>
+      <div className="subject-actions">
+        <button className="icon-btn" title={complete ? 'Done!' : 'Mark done'} onClick={onComplete} disabled={complete}>✓</button>
+        <button className="icon-btn" title="Edit" onClick={editing ? onCancelEdit : onStartEdit}>{editing ? '×' : '✎'}</button>
+        <button className="icon-btn danger" title="Remove" onClick={onRemove}>✕</button>
+      </div>
+
+      {editing && (
+        <div className="subject-edit">
+          <input type="text" value={icon} onChange={e => setIcon(e.target.value)} maxLength="2" style={{ textAlign: 'center' }} placeholder="Icon" />
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
+          <input type="number" value={target} onChange={e => setTarget(e.target.value)} min="1" placeholder="Target" />
+          <input type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder="Unit" />
+          <button className="pill-btn primary" onClick={handleSave}>Save</button>
+          <button className="pill-btn" onClick={onCancelEdit}>Cancel</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function AddForm({ onAdd }) {
+  const [icon, setIcon] = useState('✦');
+  const [name, setName] = useState('');
+  const [target, setTarget] = useState('');
+  const [unit, setUnit] = useState('');
+
+  const submit = () => {
+    if (!name.trim() || !target || !unit.trim()) return;
+    onAdd({
+      icon: (icon.trim() || '✦').slice(0, 2),
+      name: name.trim(),
+      target: Math.max(1, parseInt(target) || 1),
+      unit: unit.trim()
+    });
+    setIcon('✦'); setName(''); setTarget(''); setUnit('');
+  };
+
+  return (
+    <div className="add-form">
+      <div className="add-form-title">Add a new subject</div>
+      <div className="add-form-row">
+        <input type="text" placeholder="Icon" value={icon} onChange={e => setIcon(e.target.value)} maxLength="2" style={{ textAlign: 'center' }} />
+        <input type="text" placeholder="Subject name (e.g. Piano practice)" value={name} onChange={e => setName(e.target.value)} />
+        <input type="number" placeholder="Target" value={target} onChange={e => setTarget(e.target.value)} min="1" />
+        <input type="text" placeholder="Unit (e.g. minutes)" value={unit} onChange={e => setUnit(e.target.value)} />
+        <button onClick={submit}>Add +</button>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function StatsModal({ progress, subjects, onClose, onPickDate }) {
+  const [month, setMonth] = useState(monthKey(todayKey()));
+
+  const shiftMonth = (delta) => {
+    const [y, m] = month.split('-').map(n => +n);
+    const d = new Date(y, m - 1 + delta, 1);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  };
+
+  const daysCount = daysInMonth(month);
+  const cells = [];
+  const firstDow = (new Date(+month.slice(0,4), +month.slice(5,7) - 1, 1).getDay() + 6) % 7;
+  for (let i = 0; i < firstDow; i++) cells.push({ empty: true });
+  for (let d = 1; d <= daysCount; d++) {
+    const key = `${month}-${String(d).padStart(2,'0')}`;
+    const dp = progress[key];
+    const pct = dp ? dayCompletion(dp, subjects) : 0;
+    cells.push({ key, pct, num: d, hasData: !!dp });
+  }
+
+  let totalPctSum = 0, daysWithData = 0, perfectDays = 0;
+  cells.forEach(c => {
+    if (c.empty || !c.hasData) return;
+    daysWithData++;
+    totalPctSum += c.pct;
+    if (c.pct >= 1) perfectDays++;
+  });
+  const avgPct = daysWithData ? totalPctSum / daysWithData : 0;
+
+  const subjectMonthly = subjects.map(s => {
+    let total = 0, target = 0, days = 0;
+    cells.forEach(c => {
+      if (c.empty || !c.hasData) return;
+      const v = (progress[c.key] || {})[s.id] || 0;
+      total += v;
+      target += s.target;
+      days++;
+    });
+    return { ...s, total, target, days, pct: target ? Math.min(1, total/target) : 0 };
+  });
+
+  const bestStreak = useMemo(() => computeBestStreak(progress, subjects), [progress, subjects]);
+
+  return (
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal">
+        <div className="modal-head">
+          <h2 className="modal-title">Statistics</h2>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+
+        <div className="stats-grid">
+          <div className="stats-card">
+            <div className="label">Avg done</div>
+            <div className="value">{Math.round(avgPct * 100)}<span className="unit">%</span></div>
+          </div>
+          <div className="stats-card">
+            <div className="label">Perfect days</div>
+            <div className="value">{perfectDays}<span className="unit">this month</span></div>
+          </div>
+          <div className="stats-card">
+            <div className="label">Best streak</div>
+            <div className="value">{bestStreak}<span className="unit">days</span></div>
+          </div>
+        </div>
+
+        <div className="stats-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ margin: 0, padding: 0, border: 'none' }}>{new Date(+month.slice(0,4), +month.slice(5,7)-1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h3>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button className="pill-btn" onClick={() => shiftMonth(-1)}>‹</button>
+              <button className="pill-btn" onClick={() => shiftMonth(1)} disabled={month >= monthKey(todayKey())}>›</button>
+            </div>
+          </div>
+          <div className="month-grid">
+            {['M','T','W','T','F','S','S'].map((d, i) => (
+              <div key={'h'+i} style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 11, textAlign: 'center', color: 'var(--muted)', paddingBottom: 4 }}>{d}</div>
+            ))}
+            {cells.map((c, i) => c.empty
+              ? <div key={'e'+i} className="month-cell empty"></div>
+              : (
+                <div
+                  key={c.key}
+                  className={`month-cell ${c.pct >= 1 ? 'full' : ''}`}
+                  onClick={() => c.hasData && onPickDate(c.key)}
+                  title={`${c.key} — ${Math.round(c.pct*100)}%`}
+                >
+                  <div className="fill" style={{ height: (c.pct * 100) + '%' }}></div>
+                  <span className="num">{c.num}</span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="stats-section">
+          <h3>By subject (this month)</h3>
+          {subjectMonthly.length === 0 ? (
+            <div className="empty">No subjects yet.</div>
+          ) : (
+            <div className="subject-stats">
+              {subjectMonthly.map(s => (
+                <div key={s.id}>
+                  <div className="subj-stat-row">
+                    <div className="subj-stat-icon">{s.icon}</div>
+                    <div>
+                      <div className="subj-stat-name">{s.name}</div>
+                      <div className="subj-stat-bar"><div className="subj-stat-bar-fill" style={{ width: (s.pct*100) + '%' }}></div></div>
+                    </div>
+                    <div className="subj-stat-pct">{s.total} / {s.target} {s.unit}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function SettingsModal({ settings, config, onSave, onUpdateConfig, onClearConfig, onClose, dataSnapshot, saveStatus, saveError, onFlush }) {
+  const [name, setName] = useState(settings.child_name || '');
+  const [reminder, setReminder] = useState(settings.reminder_time || '');
+  const [notifPerm, setNotifPerm] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
+
+  const [owner, setOwner] = useState(config.owner);
+  const [repo, setRepo]   = useState(config.repo);
+  const [path, setPath]   = useState(config.path);
+  const [token, setToken] = useState(config.token);
+  const [revealToken, setRevealToken] = useState(false);
+  const [ghError, setGhError] = useState('');
+  const [ghOk, setGhOk] = useState('');
+
+  const requestNotif = async () => {
+    if (typeof Notification === 'undefined') return;
+    const p = await Notification.requestPermission();
+    setNotifPerm(p);
+    if (p === 'granted') new Notification('Reminders on', { body: "You'll get a nudge each day at the time you set." });
+  };
+
+  const saveAll = () => {
+    onSave({ child_name: name.trim(), reminder_time: reminder });
+    onClose();
+  };
+
+  const exportJson = () => {
+    const blob = new Blob([JSON.stringify(dataSnapshot, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `progress-backup-${todayKey()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const testAndSaveGh = async () => {
+    setGhError(''); setGhOk('');
+    const cfg = { owner: owner.trim(), repo: repo.trim(), path: path.trim() || 'data.json', token: token.trim() };
+    try {
+      const probe = new GhStore(cfg);
+      await probe.testConnection();
+      onUpdateConfig(cfg);
+      setGhOk('Saved. The dashboard will use these credentials on next save.');
+    } catch (e) {
+      setGhError(String(e.message || e));
+    }
+  };
+
+  const reset = () => {
+    if (confirm('Forget the GitHub setup on THIS device? Your data on GitHub stays. You can re-enter your token any time.')) {
+      onClearConfig();
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal">
+        <div className="modal-head">
+          <h2 className="modal-title">Settings</h2>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+
+        <div className="settings-section-head">General</div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Child's name</div>
+            <div className="settings-help">Personalises the title. Leave blank for "Scholar's".</div>
+          </div>
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Leo" />
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Daily reminder</div>
+            <div className="settings-help">
+              A browser nudge at this time on days the dashboard is open. Leave blank to turn off.
+              {notifPerm !== 'granted' && notifPerm !== 'unsupported' && (
+                <> · <a href="#" onClick={e => { e.preventDefault(); requestNotif(); }}>Turn on notifications</a></>
+              )}
+              {notifPerm === 'unsupported' && <> · Not supported in this browser</>}
+            </div>
+          </div>
+          <input type="time" value={reminder} onChange={e => setReminder(e.target.value)} />
+        </div>
+
+        <div className="settings-section-head">Storage (GitHub)</div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Repository</div>
+            <div className="settings-help">Owner / repo. The data file lives here.</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', maxWidth: 320 }}>
+            <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="owner" style={{ flex: 1 }} />
+            <span style={{ color: 'var(--muted)' }}>/</span>
+            <input type="text" value={repo} onChange={e => setRepo(e.target.value)} placeholder="repo" style={{ flex: 1 }} />
+          </div>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">File path</div>
+            <div className="settings-help">Path within the repo, usually <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>data.json</code>.</div>
+          </div>
+          <input type="text" value={path} onChange={e => setPath(e.target.value)} placeholder="data.json" />
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Personal access token</div>
+            <div className="settings-help">
+              Stored only in this browser. <a href="#" onClick={e => { e.preventDefault(); setRevealToken(v => !v); }}>{revealToken ? 'Hide' : 'Reveal'}</a>
+            </div>
+          </div>
+          <input type={revealToken ? 'text' : 'password'} value={token} onChange={e => setToken(e.target.value)} placeholder="ghp_… or github_pat_…" />
+        </div>
+
+        {ghError && <div className="setup-error" style={{ marginTop: 8 }}>{ghError}</div>}
+        {ghOk && <div className="setup-error" style={{ marginTop: 8, color: 'var(--accent-2)', borderColor: 'var(--accent-2)', background: 'rgba(47,165,109,0.08)' }}>{ghOk}</div>}
+
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+          <button className="pill-btn" onClick={testAndSaveGh}>Test & save GitHub</button>
+        </div>
+
+        <div className="settings-section-head">Sync & backup</div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Save now</div>
+            <div className="settings-help">
+              Force-commit pending changes immediately.
+              {saveError && <div style={{ color: 'var(--accent)', marginTop: 4 }}>Last error: {saveError}</div>}
+            </div>
+          </div>
+          <button className="pill-btn" onClick={onFlush} disabled={saveStatus === 'saving'} style={{ maxWidth: 200 }}>
+            {saveStatus === 'saving' ? 'Saving…' : 'Save now'}
+          </button>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Export backup</div>
+            <div className="settings-help">Download a JSON copy you can keep on your computer.</div>
+          </div>
+          <button className="pill-btn" onClick={exportJson} style={{ maxWidth: 200 }}>Export data.json</button>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-label">Reset device</div>
+            <div className="settings-help">Forgets the GitHub token on THIS browser. Data on GitHub is untouched.</div>
+          </div>
+          <button className="pill-btn danger" onClick={reset} style={{ maxWidth: 200 }}>Reset GitHub setup</button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 24 }}>
+          <button className="pill-btn" onClick={onClose}>Close</button>
+          <button className="pill-btn primary" onClick={saveAll}>Save settings</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function SetupWizard({ onSaved }) {
+  const [owner, setOwner] = useState('');
+  const [repo, setRepo]   = useState('child-progress-data');
+  const [path, setPath]   = useState('data.json');
+  const [token, setToken] = useState('');
+  const [importFile, setImportFile] = useState(null);
+  const [busy, setBusy]   = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async () => {
+    setError(''); setBusy(true);
+    try {
+      const cfg = { owner: owner.trim(), repo: repo.trim(), path: (path.trim() || 'data.json'), token: token.trim() };
+      if (!cfg.owner || !cfg.repo || !cfg.token) throw new Error('Fill in owner, repo, and token.');
+      const store = new GhStore(cfg);
+      const probe = await store.testConnection();
+
+      if (importFile) {
+        let parsed;
+        try {
+          const text = await importFile.text();
+          parsed = JSON.parse(text);
+        } catch (e) {
+          throw new Error('Could not read the JSON file: ' + e.message);
+        }
+        if (probe.exists) {
+          if (confirm(`A file already exists at ${cfg.path} in ${cfg.owner}/${cfg.repo}. Overwrite it with your imported data?`)) {
+            await store.load();
+            await store.save(parsed, 'Import from local data.json');
+          }
+        } else {
+          await store.save(parsed, 'Initial import from local data.json');
+        }
+      }
+
+      saveConfig(cfg);
+      onSaved(cfg);
+    } catch (e) {
+      setError(String(e.message || e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="setup-screen">
+      <div className="setup-card">
+        <h1>Scholar's <span style={{ color: 'var(--accent)' }}>&</span> Progress</h1>
+        <div className="lead">First, let's connect to GitHub so your progress is safe in the cloud.</div>
+
+        <details className="setup-howto">
+          <summary>How to set this up (5 minutes)</summary>
+          <ol>
+            <li>Create a private repo on GitHub for the data — for example <code>child-progress-data</code>. It can be empty.</li>
+            <li>Create a <strong>fine-grained personal access token</strong>: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+            <li>Set <em>Repository access</em> to "Only select repositories" → choose just the data repo. Set <em>Repository permissions → Contents</em> to <strong>Read and write</strong>. Set an expiration if you'd like.</li>
+            <li>Copy the token (starts with <code>github_pat_…</code>) and paste it below.</li>
+            <li>If you already have a <code>data.json</code> file with your existing progress, attach it below — it'll be uploaded as the first commit.</li>
+          </ol>
+        </details>
+
+        {error && <div className="setup-error">{error}</div>}
+
+        <div className="setup-field">
+          <label>GitHub username (owner)</label>
+          <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="your-github-username" autoFocus />
+        </div>
+
+        <div className="setup-field">
+          <label>Repository name</label>
+          <input type="text" value={repo} onChange={e => setRepo(e.target.value)} placeholder="child-progress-data" />
+        </div>
+
+        <div className="setup-field">
+          <label>File path in repo</label>
+          <input type="text" value={path} onChange={e => setPath(e.target.value)} placeholder="data.json" />
+          <div className="setup-help">Where the JSON lives inside the repo. <code>data.json</code> at the root is fine.</div>
+        </div>
+
+        <div className="setup-field">
+          <label>Personal access token</label>
+          <input type="password" value={token} onChange={e => setToken(e.target.value)} placeholder="github_pat_…" autoComplete="off" />
+          <div className="setup-help">Stored only in this browser. Sent only to GitHub.</div>
+        </div>
+
+        <div className="setup-field">
+          <label>Import existing data.json (optional)</label>
+          <label className="file-picker">
+            {importFile ? 'Choose a different file…' : 'Choose data.json…'}
+            <input type="file" accept="application/json,.json" onChange={e => setImportFile(e.target.files?.[0] || null)} />
+          </label>
+          {importFile && <span className="file-name">{importFile.name}</span>}
+          <div className="setup-help">If you've been using the local version, attach your <code>data.json</code> to bring its history with you.</div>
+        </div>
+
+        <div className="setup-actions">
+          <button className="pill-btn primary" onClick={submit} disabled={busy}>
+            {busy ? 'Connecting…' : 'Connect & save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+function useReminder(timeHHMM) {
+  useEffect(() => {
+    if (!timeHHMM || typeof Notification === 'undefined') return;
+    if (Notification.permission !== 'granted') return;
+
+    const STORAGE_KEY = 'sp.lastReminder';
+
+    const tick = () => {
+      const now = new Date();
+      const [hh, mm] = timeHHMM.split(':').map(n => +n);
+      const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0);
+      const last = sessionStorage.getItem(STORAGE_KEY);
+      const todayStamp = todayKey();
+
+      if (now >= target && last !== todayStamp) {
+        sessionStorage.setItem(STORAGE_KEY, todayStamp);
+        try {
+          new Notification("Time for today's tasks", {
+            body: 'Open the dashboard and update your progress.',
+            icon: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9C%A6%3C/text%3E%3C/svg%3E',
+          });
+        } catch {}
+      }
+    };
+
+    tick();
+    const id = setInterval(tick, 60 * 1000);
+    return () => clearInterval(id);
+  }, [timeHHMM]);
+}
+
+// ----------------------------------------------------------------------------
+ReactDOM.createRoot(document.getElementById('app')).render(<Root />);
+</script>
+</body>
+</html>
