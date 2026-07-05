@@ -1110,20 +1110,44 @@ class GhStore {
       settings: { ...d.settings, ...(parsed.settings || {}) },
     };
   }
+  async refreshSha() {
+    const res = await fetch(this.url, { headers: this.headers });
+    if (res.status === 404) {
+      this.sha = null;
+      return null;
+    }
+    if (!res.ok) {
+      throw new Error(`Ошибка проверки файла в GitHub (${res.status}): ${(await res.text()).slice(0, 300)}`);
+    }
+    const j = await res.json();
+    this.sha = j.sha || null;
+    return this.sha;
+  }
   async save(data, message) {
+    // GitHub requires the current SHA when updating an existing file.
+    // Refresh it before each write so token/config changes and stale tabs do not
+    // cause 422 "sha wasn't supplied" errors.
+    await this.refreshSha();
+
     const body = {
       message: message || `Обновление прогресса · ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`,
       content: utf8ToBase64(JSON.stringify(data, null, 2)),
     };
     if (this.sha) body.sha = this.sha;
     if (this.cfg.branch) body.branch = this.cfg.branch;
+
     const headers = { ...this.headers, 'Content-Type': 'application/json' };
     let res = await fetch(this.url, { method: 'PUT', headers, body: JSON.stringify(body) });
-    if (res.status === 409) {
-      await this.load();
-      body.sha = this.sha;
+
+    // If another tab/device changed the file between our SHA check and PUT,
+    // refresh the SHA and retry once.
+    if (res.status === 409 || res.status === 422) {
+      await this.refreshSha();
+      if (this.sha) body.sha = this.sha;
+      else delete body.sha;
       res = await fetch(this.url, { method: 'PUT', headers, body: JSON.stringify(body) });
     }
+
     if (!res.ok) {
       throw new Error(`Ошибка сохранения в GitHub (${res.status}): ${(await res.text()).slice(0, 300)}`);
     }
